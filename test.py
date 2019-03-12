@@ -88,13 +88,13 @@ def isInTimeRange(timeStart, timeEnd, t):
         return True
     return False
 
-def cleanData(l):
+def cleanData(l, defaultVal = ''):
     r = []
     for v in l:
         if isValidVal(v):
             r.append(int(v))
         else:
-            r.append('')
+            r.append(defaultVal)
     return r
   
 def validLen(l, validtype=[int, float]):
@@ -162,12 +162,12 @@ def maxKey(v):
 def formatNumVal(l):
     r = []
     for num in l:
-        val = num
+        val = 0
         try:
-            val = int(val)
+            val = int(num)
         except:
             try:
-                val = float(val)
+                val = float(num)
             except:
                 # print('error formatNumVal ', val)
                 pass
@@ -176,12 +176,9 @@ def formatNumVal(l):
     return r
 
 def MNValidLen(l):
-    m = formatNumVal(l)
-    r = False
-    for e in m:
-        if e != 0:
-            r = True
-    return r
+    if sum(l) == 0:
+        return False
+    return True
 
 # filepath = r'C:\Users\Arenas\Desktop\chenxiang\137097.xls'
 # dataTable = app.books.open(filepath)
@@ -255,15 +252,23 @@ for idx in range(len(filePaths)):
 
         validEList = cleanData(validEList)
         validFList = cleanData(validFList)
-        validMListT1 = cleanData(validMListT1)
-        validNListT1 = cleanData(validNListT1)
+
+        validMListT1 = formatNumVal(validMListT1)
+        validMListT1 = cleanData(validMListT1, defaultVal=0)
+        validNListT1 = formatNumVal(validNListT1)
+        validNListT1 = cleanData(validNListT1, defaultVal=0)
 
         validGListT1 = formatNumVal(validGListT1)
-        validGListT1 = cleanData(validGListT1)
+        validGListT1 = cleanData(validGListT1, defaultVal=0)
         validEListT1 = formatNumVal(validEListT1)
-        validEListT1 = cleanData(validEListT1)
+        validEListT1 = cleanData(validEListT1, defaultVal=0)
         validFListT1 = formatNumVal(validFListT1)
-        validFListT1 = cleanData(validFListT1)
+        validFListT1 = cleanData(validFListT1, defaultVal=0)
+
+        validMListT2 = formatNumVal(validMListT2)
+        validMListT2 = cleanData(validMListT2, defaultVal=0)
+        validNListT2 = formatNumVal(validNListT2)
+        validNListT2 = cleanData(validNListT2, defaultVal=0)
 
         for i in range(len(validEList)):
             if isValidVal(validEList[i]) and isValidVal(validFList[i]):
@@ -273,7 +278,7 @@ for idx in range(len(filePaths)):
         
         if not MNValidLen(validMListT1) or not MNValidLen(validNListT1):
             for i in range(len(validEListT1)):
-                if isValidVal(validEListT1[i]) and isValidVal(validFListT1[i]):
+                if i < len(validFListT1) and isValidVal(validEListT1[i]) and isValidVal(validFListT1[i]):
                     validX2ListT1.append(validFListT1[i] + (validEListT1[i] - validFListT1[i])/3)
                 else:
                     validX2ListT1.append('')
