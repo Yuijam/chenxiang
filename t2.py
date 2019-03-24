@@ -8,12 +8,12 @@ starttime = datetime.datetime.now()
 logging.basicConfig(filename='logger.log', level=logging.INFO)
 
 # rootPath = r'D:\code\chenxiang\data\errorData'
-# rootPath = r'D:\code\chenxiang\data\testdata'
-rootPath = r'D:\code\chenxiang\data\data'
+rootPath = r'D:\code\chenxiang\data\testdata'
+# rootPath = r'D:\code\chenxiang\data\data'
 timePath = r'D:\code\chenxiang\data\baguan10.xlsx'
 # timePath = r'D:\code\chenxiang\data\testtime.xlsx'
-outputPath = r'D:\code\chenxiang\data\output_baguan.xlsx'
-# outputPath = r'D:\code\chenxiang\data\testoutput.xlsx'
+# outputPath = r'D:\code\chenxiang\data\output_baguan.xlsx'
+outputPath = r'D:\code\chenxiang\data\testoutput.xlsx'
 
 curHandleUserId = 0
 
@@ -312,19 +312,19 @@ def earlierSec(timePoint, sec):
 def parseData(timePoint, tList, data1, data2):
     res = []
     for i in range(1, 22):
-        timePoint = longerMin(timePoint, (i-1) * 1)
-        longerTenSec = longerSec(timePoint, 10)
-        earlierTenSec = earlierSec(timePoint, 10)
-        idx, data = getRangeIdx(timePoint, longerTenSec, tList, data1)
+        newTimePoint = longerMin(timePoint, (i-1) * 1)
+        longerTenSec = longerSec(newTimePoint, 10)
+        earlierTenSec = earlierSec(newTimePoint, 10)
+        idx, data = getRangeIdx(newTimePoint, longerTenSec, tList, data1)
 
         if not idx:
-            idx, data = getRangeIdx(earlierTenSec, timePoint, tList, data1)
+            idx, data = getRangeIdx(earlierTenSec, newTimePoint, tList, data1)
         
         if not idx and data2:
-            idx, data = getRangeIdx(timePoint, longerTenSec, tList, data2)
+            idx, data = getRangeIdx(newTimePoint, longerTenSec, tList, data2)
 
         if not idx and data2:
-            idx, data = getRangeIdx(earlierTenSec, timePoint, tList, data2)
+            idx, data = getRangeIdx(earlierTenSec, newTimePoint, tList, data2)
 
         if not idx:
             data = 0
