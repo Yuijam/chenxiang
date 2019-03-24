@@ -2,14 +2,18 @@ import xlwings as xw
 import math
 import os
 import logging
+import datetime
+starttime = datetime.datetime.now()
 logging.basicConfig(filename='logger.log', level=logging.INFO)
 
 # rootPath = r'D:\code\chenxiang\data\errorData'
-# rootPath = r'D:\code\chenxiang\data\testdata'
-rootPath = r'D:\code\chenxiang\data\data'
+rootPath = r'D:\code\chenxiang\data\testdata'
+# rootPath = r'D:\code\chenxiang\data\data'
 timePath = r'D:\code\chenxiang\data\shou_shu_time.xlsx'
 # timePath = r'D:\code\chenxiang\data\testtime.xlsx'
 outputPath = r'D:\code\chenxiang\data\output.xlsx'
+outputPath1 = r'D:\code\chenxiang\data\output_W_X2.xlsx'
+# outputPath1 = r'D:\code\chenxiang\data\testoutputWX2.xlsx'
 # outputPath = r'D:\code\chenxiang\data\testoutput.xlsx'
 
 curHandleUserId = 0
@@ -206,11 +210,11 @@ def countLarger(l, m, equ=True):
             if equ:
                 if float(i) >= m:
                     c = c + 1
-                    retList.append(i)
+                    retList.append(round(i, 3))
             else:
                 if float(i) > m:
                     c = c + 1
-                    retList.append(i)
+                    retList.append(round(i, 3))
     return c, retList
 
 def countLower(l, m, equ=True):
@@ -221,11 +225,11 @@ def countLower(l, m, equ=True):
             if equ:
                 if float(i) <= m:
                     c = c + 1
-                    retList.append(i)
+                    retList.append(round(i, 3))
             else:
                 if float(i) < m:
                     c = c + 1
-                    retList.append(i)
+                    retList.append(round(i, 3))
     return c, retList
 
 def isEEmpty(e):
@@ -240,7 +244,7 @@ def isFEmpty(f):
 def longerMin(userTime, mini):
     l = userTime.split(':')
     fen = (int(l[1]) + mini) % 60
-    shi = int(l[0]) + math.floor(fen/60)
+    shi = (int(l[0]) + math.floor((int(l[1]) + mini)/60))%24
     miao = l[2]
     r = str(shi) + ':' + str(fen)+ ':' + miao
     return r
@@ -268,8 +272,17 @@ def handleEmpty(l, tList, startTime, endTime, dataName):
 
 
 outputTable = app.books.open(outputPath)
+outputTableWX = app.books.open(outputPath1)
 outputSheet = outputTable.sheets['Sheet1']
-rowIdx = 3
+outputWXSheet = outputTableWX.sheets['Sheet1']
+
+outputWXSheet.range('A1').value = '姓名'
+outputWXSheet.range('B1').value = '住院号'
+outputWXSheet.range('C1').value = '时间'
+# rowIdx = 3
+# wxRowIdx = 2
+rowIdx = 1494
+wxRowIdx = 5966
 try:
     for idx in range(len(filePaths)):
         dataTable = None
@@ -413,6 +426,8 @@ try:
             outputSheet.range('B'+str(rowIdx)).value = userid
             outputSheet.range('C'+str(rowIdx)).value = max(validEListT3, key = maxKey)
             outputSheet.range('D'+str(rowIdx)).value = min(validEListT3, key = minKey)
+            outputWXSheet.range('A'+str(wxRowIdx)).value = userName
+            outputWXSheet.range('B'+str(wxRowIdx)).value = userid
             # print('validEListT3 len == ', len(validEListT3))
             # print('E min == ', min(validEListT3, key = minKey))
             # print('E max == ', max(validEListT3, key = maxKey))
@@ -436,8 +451,8 @@ try:
             # print('G max == ', max(validGListT3, key = maxKey))
             # print('G avg == ', average(validGListT3))
             
-            outputSheet.range('L'+str(rowIdx)).value = max(X1List, key = maxKey)
-            outputSheet.range('M'+str(rowIdx)).value = min(X1List, key = minKey)
+            outputSheet.range('L'+str(rowIdx)).value = round(max(X1List, key = maxKey), 3)
+            outputSheet.range('M'+str(rowIdx)).value = round(min(X1List, key = minKey), 3)
             # print('X1List len == ', len(X1List))
             # print('X1 min == ', min(X1List, key = minKey))
             # print('X1 max == ', max(X1List, key = maxKey))
@@ -500,16 +515,16 @@ try:
             # print('G max == ', max(validGListT2, key = maxKey))
             # print('G avg == ', average(validGListT2))
             
-            outputSheet.range('Y'+str(rowIdx)).value = max(X2ListT1, key = maxKey)
-            outputSheet.range('Z'+str(rowIdx)).value = min(X2ListT1, key = minKey)
+            outputSheet.range('Y'+str(rowIdx)).value = round(max(X2ListT1, key = maxKey), 3)
+            outputSheet.range('Z'+str(rowIdx)).value = round(min(X2ListT1, key = minKey), 3)
             outputSheet.range('AA'+str(rowIdx)).value = average(X2ListT1)
             # print('X2ListT1 len == ', len(X2ListT1))
             # print('X2_T1 min == ', min(X2ListT1, key = minKey))
             # print('X2_T1 max == ', max(X2ListT1, key = maxKey))
             # print('X2_T1 avg == ', average(X2ListT1))
             
-            outputSheet.range('AS'+str(rowIdx)).value = max(X2ListT2, key = maxKey)
-            outputSheet.range('AT'+str(rowIdx)).value = min(X2ListT2, key = minKey)
+            outputSheet.range('AS'+str(rowIdx)).value = round(max(X2ListT2, key = maxKey), 3)
+            outputSheet.range('AT'+str(rowIdx)).value = round(min(X2ListT2, key = minKey), 3)
             outputSheet.range('AU'+str(rowIdx)).value = average(X2ListT2)
             # print('X2ListT2 len == ', len(X2ListT2))
             # print('X2_T2 min == ', min(X2ListT2, key = minKey))
@@ -530,24 +545,36 @@ try:
             # print('count X2_T1 <= 60 ==', countLower(X2ListT1, 60)[0])
             # print('count X2_T2 <= 60 ==', countLower(X2ListT2, 60)[0])
 
+            outputWXSheet.range('C'+str(wxRowIdx)).value = 'T1'
+            outputWXSheet.range('C'+str(wxRowIdx)).color = (13, 241, 29)
+            outputWXSheet.range('C'+str(wxRowIdx + 2)).value = 'T2'
+            outputWXSheet.range('C'+str(wxRowIdx + 2)).color = (227, 194, 27)
+            outputWXSheet.range('D'+str(wxRowIdx)).value = 'M≥Y*1.25'
+            outputWXSheet.range('D'+str(wxRowIdx + 1)).value = 'X2≥Y1*1.25'
+            outputWXSheet.range('D'+str(wxRowIdx + 2)).value = 'M≥Y*1.25'
+            outputWXSheet.range('D'+str(wxRowIdx + 3)).value = 'X2≥Y1*1.25'
             mT1LagerYCount, mT1LagerYList = countLarger(validMListT1, Y*1.25)
             # print('count M_T1 >= Y*1.25 ==', mT1LagerYCount)
-            # outputSheet.range('AD'+str(rowIdx)).value = mT1LagerYList
+            outputSheet.range('AD'+str(rowIdx)).value = str(mT1LagerYList)
+            outputWXSheet.range('E'+str(wxRowIdx)).value = mT1LagerYList
             outputSheet.range('AE'+str(rowIdx)).value = mT1LagerYCount
 
             mT2LagerYCount, mT2LagerYList = countLarger(validMListT2, Y*1.25)
             # print('count M_T2 >= Y*1.25 ==', mT2LagerYCount)
-            # outputSheet.range('AX'+str(rowIdx)).value = mT2LagerYList
+            outputSheet.range('AX'+str(rowIdx)).value = str(mT2LagerYList)
+            outputWXSheet.range('E'+str(wxRowIdx + 2)).value = mT2LagerYList
             outputSheet.range('AY'+str(rowIdx)).value = mT2LagerYCount
 
             x2T1LagerYCount, x2T1LagerYList = countLarger(X2ListT1, Y1*1.25)
             # print('count X2_T1 >= Y1*1.25 ==', x2T1LagerYCount)
-            # outputSheet.range('AF'+str(rowIdx)).value = x2T1LagerYList
+            outputSheet.range('AF'+str(rowIdx)).value = str(x2T1LagerYList)
+            outputWXSheet.range('E'+str(wxRowIdx + 1)).value = x2T1LagerYList
             outputSheet.range('AG'+str(rowIdx)).value = x2T1LagerYCount
 
             x2T2LagerYCount, x2T2LagerYList = countLarger(X2ListT2, Y1*1.25)
             # print('count X2_T2 >= Y1*1.25 ==', x2T2LagerYCount)
-            # outputSheet.range('AZ'+str(rowIdx)).value = x2T2LagerYList
+            outputSheet.range('AZ'+str(rowIdx)).value = str(x2T2LagerYList)
+            outputWXSheet.range('E'+str(wxRowIdx + 3)).value = x2T2LagerYList
             outputSheet.range('BA'+str(rowIdx)).value = x2T2LagerYCount
 
             # print('count H_T1 <= 90', countLower(validHListT1, 90)[0])
@@ -555,7 +582,14 @@ try:
 
             # print('count H_T2 <= 90', countLower(validHListT2, 90)[0])
             outputSheet.range('BB'+str(rowIdx)).value = countLower(validHListT2, 90)[0]
+
+            x2T2Lager119Count, x2T2Lager119List = countLarger(X2ListT2, 119, equ=False)
+            x2T2Lager129Count, x2T2Lager129List = countLarger(X2ListT2, 129, equ=False)
+            outputSheet.range('BC'+str(rowIdx)).value = x2T2Lager119Count
+            outputSheet.range('BD'+str(rowIdx)).value = x2T2Lager129Count
+
             rowIdx = rowIdx + 1
+            wxRowIdx = wxRowIdx + 4
         except:
             logging.info('ERROR on handle %s' % (userid))
         finally:
@@ -569,4 +603,8 @@ try:
 finally:
     outputTable.save()
     outputTable.close()
+    outputTableWX.save()
+    outputTableWX.close()
     app.quit()
+    endtime = datetime.datetime.now()
+    logging.info('Run %s seconds' % ((endtime - starttime).seconds))
